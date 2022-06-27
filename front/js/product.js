@@ -1,13 +1,11 @@
 // On récupère l'id du produit dans l'url de la page courrante :
 
 let current_url = document.location.href;
-console.log(current_url)
 let url = new URL(current_url);
 let search_params = new URLSearchParams(url.search);
 if (search_params.has('id')) {
   let id_collected = search_params.get('id');
   var id_collected_wo_space = id_collected.replace(/ /g, '');
-  console.log(id_collected_wo_space);
 }
 
 // On requête l'API pour récupérer uniquement le produit dont l'id est dans l'url de la page :
@@ -45,7 +43,7 @@ function all_products_from_API() {
 
       let product_options = document.querySelector('#colors');
       product_options.innerHTML = '<option value="">--SVP, choisissez une couleur --</option><option value="vert">vert</option><option value="blanc">blanc</option>';
-    // voir si on ne peut pas faire mieux sur la ligne ci-dessous pour ne pas reprendre du HTML non commenté
+      // voir si on ne peut pas faire mieux sur la ligne ci-dessous pour ne pas reprendre du HTML non commenté
 
     }
     )
@@ -55,17 +53,50 @@ function all_products_from_API() {
     ;
 }
 
-/* let button = document.querySelector('button');
-let number_of_items = 0;
+// On stocke ce qui est ajouté au panier à chaque clic sur le bouton avec localStorage :
 
-button.addEventListener('click', () => {  
-    if(confirm('Etes-vous sûr ?')) {   
-      localStorage.setItem('id', ''+id_collected_wo_space+'');
-      localStorage.setItem('number_of_items', ''+ number_of_items +'');
-      localStorage.setItem('color', ''+  +'');
+let button = document.querySelector('button');
+
+let select = document.querySelector("#colors");
+
+button.addEventListener('click', () => {
+  if (confirm('Etes-vous sûr ?')) {
+    var lastSelected = select.options[select.selectedIndex].value;
+    var quantity = parseInt(document.querySelector("#quantity").value);
+
+    if (localStorage.getItem('product_1') == null) {
+      var product_1 = {
+        id : id_collected_wo_space,
+        color : lastSelected,
+        quantity : quantity,
+      }
+        localStorage.setItem('product_1', JSON.stringify(product_1));
+      }
+    
+      else if ((((JSON.parse(localStorage.getItem('product_1'))).id) == id_collected_wo_space) 
+      && (((JSON.parse(localStorage.getItem('product_1'))).color) == lastSelected)) 
+      {
+      let sum = ((JSON.parse(localStorage.getItem('product_1'))).quantity) + quantity;
+      var product_1 = {
+        id : id_collected_wo_space,
+        color : lastSelected,
+        quantity : sum,
+      }
+      localStorage.setItem('product_1', JSON.stringify(product_1));
+      }
+
+      else if (((JSON.parse(localStorage.getItem('product_1'))).color) != lastSelected) {
+        var product_1bis = {
+          id : id_collected_wo_space,
+          color : lastSelected,
+          quantity : quantity,
+        }
+        localStorage.setItem('product_1bis', JSON.stringify(product_1bis));  
+      }
     }
-  }); */
+  }
+);
 
-
-
-
+console.log((JSON.parse(localStorage.getItem('product_1bis'))).id); 
+console.log((JSON.parse(localStorage.getItem('product_1bis'))).color); 
+console.log((JSON.parse(localStorage.getItem('product_1bis'))).quantity); 
