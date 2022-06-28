@@ -10,9 +10,9 @@ if (search_params.has('id')) {
 
 // On requête l'API pour récupérer uniquement le produit dont l'id est dans l'url de la page :
 
-all_products_from_API();
+one_product_from_API();
 
-function all_products_from_API() {
+function one_product_from_API() {
 
   fetch("http://localhost:3000/api/products/" + id_collected_wo_space + "")
 
@@ -29,22 +29,26 @@ function all_products_from_API() {
       console.log(product);
 
       // On insère les données selon ce qui est commenét dans le fichier HTML :
-      let product_image = document.querySelector('.item__img');
+      var product_image = document.querySelector('.item__img');
       product_image.innerHTML = '<img src="' + product.imageUrl + '">';
 
-      let product_name = document.querySelector('#title');
+      var product_name = document.querySelector('#title');
       product_name.textContent = '' + product.name + '';
 
-      let product_price = document.querySelector('#price');
+      var product_price = document.querySelector('#price');
       product_price.textContent = '' + product.price + '';
 
-      let product_description = document.querySelector('#description');
+      var product_description = document.querySelector('#description');
       product_description.textContent = '' + product.description + '';
 
-      let product_options = document.querySelector('#colors');
-      product_options.innerHTML = '<option value="">--SVP, choisissez une couleur --</option><option value="vert">vert</option><option value="blanc">blanc</option>';
+      var product_options = document.querySelector('#colors');
+      if (product.colors[2] == null) {
+        product_options.innerHTML = '<option value="">--SVP, choisissez une couleur --</option><option value="' + product.colors[0] + '">' + product.colors[0] + '</option><option value="' + product.colors[1] + '">' + product.colors[1] + '</option>';
+      }
+      else {
+        product_options.innerHTML = '<option value="">--SVP, choisissez une couleur --</option><option value="' + product.colors[0] + '">' + product.colors[0] + '</option><option value="' + product.colors[1] + '">' + product.colors[1] + '</option><option value="' + product.colors[2] + '">' + product.colors[2] + '</option>';
+      }
       // voir si on ne peut pas faire mieux sur la ligne ci-dessous pour ne pas reprendre du HTML non commenté
-
     }
     )
     .catch(function (err) {
@@ -64,39 +68,41 @@ button.addEventListener('click', () => {
     var lastSelected = select.options[select.selectedIndex].value;
     var quantity = parseInt(document.querySelector("#quantity").value);
 
-    if (localStorage.getItem('product_1') == null) {
-      var product_1 = {
-        id : id_collected_wo_space,
-        color : lastSelected,
-        quantity : quantity,
-      }
-        localStorage.setItem('product_1', JSON.stringify(product_1));
-      }
-    
-      else if ((((JSON.parse(localStorage.getItem('product_1'))).id) == id_collected_wo_space) 
-      && (((JSON.parse(localStorage.getItem('product_1'))).color) == lastSelected)) 
-      {
-      let sum = ((JSON.parse(localStorage.getItem('product_1'))).quantity) + quantity;
-      var product_1 = {
-        id : id_collected_wo_space,
-        color : lastSelected,
-        quantity : sum,
-      }
-      localStorage.setItem('product_1', JSON.stringify(product_1));
+    for (let i = 1; i<=21; i++) {
+
+      if (localStorage.getItem('product_' + i + '') == null) {
+        var product_i = {
+          id: id_collected_wo_space,
+          color: lastSelected,
+          quantity: quantity,
+        }
+        localStorage.setItem('product_' + i + '', JSON.stringify(product_i));
+        { break; }
       }
 
-      else if (((JSON.parse(localStorage.getItem('product_1'))).color) != lastSelected) {
-        var product_1bis = {
-          id : id_collected_wo_space,
-          color : lastSelected,
-          quantity : quantity,
+      else if ((((JSON.parse(localStorage.getItem('product_' + i + ''))).id) == id_collected_wo_space)
+        && (((JSON.parse(localStorage.getItem('product_' + i + ''))).color) == lastSelected)) {
+        let sum = ((JSON.parse(localStorage.getItem('product_' + i + ''))).quantity) + quantity;
+        var product_i = {
+          id: id_collected_wo_space,
+          color: lastSelected,
+          quantity: sum,
         }
-        localStorage.setItem('product_1bis', JSON.stringify(product_1bis));  
+        localStorage.setItem('product_' + i + '', JSON.stringify(product_i));
+        { break; }
+      }
+
+      else if (((((JSON.parse(localStorage.getItem('product_' + i + ''))).color) != lastSelected))
+        && ((localStorage.getItem('product_' + i + '') == null))) {
+        var product_i = {
+          id: id_collected_wo_space,
+          color: lastSelected,
+          quantity: quantity,
+        }
+        localStorage.setItem('product_' + i + '', JSON.stringify(product_i));
+        { break; }
       }
     }
   }
+}
 );
-
-console.log((JSON.parse(localStorage.getItem('product_1bis'))).id); 
-console.log((JSON.parse(localStorage.getItem('product_1bis'))).color); 
-console.log((JSON.parse(localStorage.getItem('product_1bis'))).quantity); 

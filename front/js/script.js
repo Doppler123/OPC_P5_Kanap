@@ -1,3 +1,4 @@
+// On requête l'API pour récupérer tous les produits :
 all_products_from_API();
 
 function all_products_from_API() {
