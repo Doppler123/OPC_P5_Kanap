@@ -42,11 +42,46 @@ function all_products_from_API() {
         }
       }
 
-      // On se place au niveau de l'id "#cart__items" du HTML :
-      let cart__items = document.querySelector('#cart__items');
+      // On récupère la quantité totale de products dans le panier :  
+      var total_quantity = 0;
+      for (let i = 1; i <= localStorage.length; i++) {
+        total_quantity += (JSON.parse(localStorage.getItem('product_' + (i) + '')).quantity);
+      }
+
+      // On affiche la quantité totale de products dans le panier au bon endroit :
+      let totalQuantityId = document.querySelector('#totalQuantity');
+      totalQuantityId.innerHTML = total_quantity;
+
+      // On récupère le montant total du panier :  
+      var total_price = 0;
+      for (let i = 1; i <= localStorage.length; i++) {
+        total_price += ((JSON.parse(localStorage.getItem('product_' + (i) + '')).quantity) * getData(i)[3]);
+      }
+      
+      // On ajoute une fonction permettant de séparer les milliers pour plus de lisibilité :
+      function numStr(a, b) {
+        a = '' + a;
+        b = b || ' ';
+        var c = '',
+            d = 0;
+        while (a.match(/^0[0-9]/)) {
+          a = a.substr(1);
+        }
+        for (var i = a.length-1; i >= 0; i--) {
+          c = (d != 0 && d % 3 == 0) ? a[i] + b + c : a[i] + c;
+          d++;
+        }
+        return c;
+      }
+
+      // On affiche le montant total du panier au bon endroit :
+      let totalPriceId = document.querySelector('#totalPrice');
+      totalPriceId.innerHTML = numStr(total_price);
 
       // On met en place une boucle qui vient itérer sur chaque produit dans le local storage et on récupère les bonnes données aux bons endroits :
-      for (let i = 1; i <= 21; i++) {
+      let cart__items = document.querySelector('#cart__items');
+
+      for (let i = 1; i <= localStorage.length; i++) {
         cart__items.innerHTML += '<article class="cart__item" data-id="'
           + (JSON.parse(localStorage.getItem('product_' + i + '')).id) + '" data-color="'
           + (JSON.parse(localStorage.getItem('product_' + i + '')).color)
@@ -56,9 +91,16 @@ function all_products_from_API() {
           + getData(i)[2] + '</h2><p>'
           + (JSON.parse(localStorage.getItem('product_' + i + '')).color)
           + '</p><p>'
-          + getData(i)[3] + '</p></div><div class="cart__item__content__settings"><div class="cart__item__content__settings__quantity"><p>Qté : '
-          + (JSON.parse(localStorage.getItem('product_' + i + '')).quantity) + ' </p><input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="42"></div><div class="cart__item__content__settings__delete"><p class="deleteItem">Supprimer</p></div></div></div></article>';
-      }
+          + getData(i)[3] + ' €</p></div><div class="cart__item__content__settings"><div class="cart__item__content__settings__quantity"><p>Qté : </p><input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="'
+          + (JSON.parse(localStorage.getItem('product_' + i + '')).quantity) + '"></div><div class="cart__item__content__settings__delete"><p class="deleteItem">Supprimer</p></div></div></div></article>';
+      } 
+
+      let itemQuantity = document.querySelector(".itemQuantity");
+      
+      itemQuantity.addEventListener('change', function () {
+      itemQuantity.setAttribute('value', this.value);  
+      }); 
+       
     }
     )
 
@@ -67,3 +109,7 @@ function all_products_from_API() {
     })
     ;
 }
+
+
+
+

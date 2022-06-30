@@ -28,7 +28,7 @@ function one_product_from_API() {
       const product = requestResults;
       console.log(product);
 
-      // On insère les données selon ce qui est commenét dans le fichier HTML :
+      // On insère les données selon ce qui est commenté dans le fichier HTML :
       var product_image = document.querySelector('.item__img');
       product_image.innerHTML = '<img src="' + product.imageUrl + '">';
 
@@ -45,8 +45,11 @@ function one_product_from_API() {
       if (product.colors[2] == null) {
         product_options.innerHTML = '<option value="">--SVP, choisissez une couleur --</option><option value="' + product.colors[0] + '">' + product.colors[0] + '</option><option value="' + product.colors[1] + '">' + product.colors[1] + '</option>';
       }
-      else {
+      else if (product.colors[3] == null) {
         product_options.innerHTML = '<option value="">--SVP, choisissez une couleur --</option><option value="' + product.colors[0] + '">' + product.colors[0] + '</option><option value="' + product.colors[1] + '">' + product.colors[1] + '</option><option value="' + product.colors[2] + '">' + product.colors[2] + '</option>';
+      }
+      else {
+        product_options.innerHTML = '<option value="">--SVP, choisissez une couleur --</option><option value="' + product.colors[0] + '">' + product.colors[0] + '</option><option value="' + product.colors[1] + '">' + product.colors[1] + '</option><option value="' + product.colors[2] + '">' + product.colors[2] + '</option><option value="' + product.colors[3] + '">' + product.colors[3] + '</option>';
       }
       // voir si on ne peut pas faire mieux sur la ligne ci-dessous pour ne pas reprendre du HTML non commenté
     }
@@ -64,45 +67,60 @@ let button = document.querySelector('button');
 let select = document.querySelector("#colors");
 
 button.addEventListener('click', () => {
-  if (confirm('Etes-vous sûr ?')) {
-    var lastSelected = select.options[select.selectedIndex].value;
-    var quantity = parseInt(document.querySelector("#quantity").value);
 
-    for (let i = 1; i<=21; i++) {
+  var lastSelected = select.options[select.selectedIndex].value;
+  var quantity = parseInt(document.querySelector("#quantity").value);
 
-      if (localStorage.getItem('product_' + i + '') == null) {
-        var product_i = {
-          id: id_collected_wo_space,
-          color: lastSelected,
-          quantity: quantity,
+  if (quantity !== 0 && lastSelected !== '') {
+
+    if (confirm('Etes-vous sûr ?')) {
+
+      for (let i = 1; i <= 21; i++) {
+
+        if (localStorage.getItem('product_' + i + '') == null) {
+          var product_i = {
+            id: id_collected_wo_space,
+            color: lastSelected,
+            quantity: quantity,
+          }
+          localStorage.setItem('product_' + i + '', JSON.stringify(product_i));
+          { break; }
         }
-        localStorage.setItem('product_' + i + '', JSON.stringify(product_i));
-        { break; }
-      }
 
-      else if ((((JSON.parse(localStorage.getItem('product_' + i + ''))).id) == id_collected_wo_space)
-        && (((JSON.parse(localStorage.getItem('product_' + i + ''))).color) == lastSelected)) {
-        let sum = ((JSON.parse(localStorage.getItem('product_' + i + ''))).quantity) + quantity;
-        var product_i = {
-          id: id_collected_wo_space,
-          color: lastSelected,
-          quantity: sum,
+        else if ((((JSON.parse(localStorage.getItem('product_' + i + ''))).id) == id_collected_wo_space)
+          && (((JSON.parse(localStorage.getItem('product_' + i + ''))).color) == lastSelected)) {
+          let sum = ((JSON.parse(localStorage.getItem('product_' + i + ''))).quantity) + quantity;
+          var product_i = {
+            id: id_collected_wo_space,
+            color: lastSelected,
+            quantity: sum,
+          }
+          localStorage.setItem('product_' + i + '', JSON.stringify(product_i));
+          { break; }
         }
-        localStorage.setItem('product_' + i + '', JSON.stringify(product_i));
-        { break; }
-      }
 
-      else if (((((JSON.parse(localStorage.getItem('product_' + i + ''))).color) != lastSelected))
-        && ((localStorage.getItem('product_' + i + '') == null))) {
-        var product_i = {
-          id: id_collected_wo_space,
-          color: lastSelected,
-          quantity: quantity,
+        else if (((((JSON.parse(localStorage.getItem('product_' + i + ''))).color) != lastSelected))
+          && ((localStorage.getItem('product_' + i + '') == null))) {
+          var product_i = {
+            id: id_collected_wo_space,
+            color: lastSelected,
+            quantity: quantity,
+          }
+          localStorage.setItem('product_' + i + '', JSON.stringify(product_i));
+          { break; }
+
         }
-        localStorage.setItem('product_' + i + '', JSON.stringify(product_i));
-        { break; }
       }
     }
+  }
+  else if (quantity == 0 && lastSelected !== '') {
+    alert('Merci de préciser une quantité');
+  }
+  else if (quantity !== 0 && lastSelected == '') {
+    alert('Merci de sélectionner une couleur');
+  }
+  else if (quantity == 0 && lastSelected == '') {
+    alert('Merci de sélectionner une couleur et de préciser une quantité');
   }
 }
 );
