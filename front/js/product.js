@@ -42,16 +42,10 @@ function one_product_from_API() {
       product_description.textContent = '' + product.description + '';
 
       var product_options = document.querySelector('#colors');
-      if (product.colors[2] == null) {
-        product_options.innerHTML = '<option value="">--SVP, choisissez une couleur --</option><option value="' + product.colors[0] + '">' + product.colors[0] + '</option><option value="' + product.colors[1] + '">' + product.colors[1] + '</option>';
-      }
-      else if (product.colors[3] == null) {
-        product_options.innerHTML = '<option value="">--SVP, choisissez une couleur --</option><option value="' + product.colors[0] + '">' + product.colors[0] + '</option><option value="' + product.colors[1] + '">' + product.colors[1] + '</option><option value="' + product.colors[2] + '">' + product.colors[2] + '</option>';
-      }
-      else {
-        product_options.innerHTML = '<option value="">--SVP, choisissez une couleur --</option><option value="' + product.colors[0] + '">' + product.colors[0] + '</option><option value="' + product.colors[1] + '">' + product.colors[1] + '</option><option value="' + product.colors[2] + '">' + product.colors[2] + '</option><option value="' + product.colors[3] + '">' + product.colors[3] + '</option>';
-      }
-      // voir si on ne peut pas faire mieux sur la ligne ci-dessous pour ne pas reprendre du HTML non commenté
+
+      product.colors.forEach(i => {
+        product_options.innerHTML += '<option value="' + i + '">' + i + '</option>';
+      });
     }
     )
     .catch(function (err) {
@@ -75,52 +69,40 @@ button.addEventListener('click', () => {
 
     if (confirm('Etes-vous sûr ?')) {
 
-      for (let i = 1; i <= 21; i++) {
+      var oldItems = JSON.parse(localStorage.getItem('productsInCart')) || [];
 
-        if (localStorage.getItem('product_' + i + '') == null) {
-          var product_i = {
-            id: id_collected_wo_space,
-            color: lastSelected,
-            quantity: quantity,
-          }
-          localStorage.setItem('product_' + i + '', JSON.stringify(product_i));
-          { break; }
+      const afterIdFilter = oldItems.filter(item => item.id === id_collected_wo_space);
+      const afterColorFilter = afterIdFilter.filter(items => items.color === lastSelected);
+
+      if (afterColorFilter.length == 0) {
+      var newItem = {
+          id: id_collected_wo_space,
+          color: lastSelected,
+          quantity: quantity,
         }
-
-        else if ((((JSON.parse(localStorage.getItem('product_' + i + ''))).id) == id_collected_wo_space)
-          && (((JSON.parse(localStorage.getItem('product_' + i + ''))).color) == lastSelected)) {
-          let sum = ((JSON.parse(localStorage.getItem('product_' + i + ''))).quantity) + quantity;
-          var product_i = {
-            id: id_collected_wo_space,
-            color: lastSelected,
-            quantity: sum,
-          }
-          localStorage.setItem('product_' + i + '', JSON.stringify(product_i));
-          { break; }
-        }
-
-        else if (((((JSON.parse(localStorage.getItem('product_' + i + ''))).color) != lastSelected))
-          && ((localStorage.getItem('product_' + i + '') == null))) {
-          var product_i = {
-            id: id_collected_wo_space,
-            color: lastSelected,
-            quantity: quantity,
-          }
-          localStorage.setItem('product_' + i + '', JSON.stringify(product_i));
-          { break; }
-
-        }
+      oldItems.push(newItem);
+      localStorage.setItem('productsInCart', JSON.stringify(oldItems));
+      }
+      else { 
+        var indexWanted = oldItems.indexOf(afterColorFilter[0]);
+        oldItems[indexWanted].quantity = oldItems[indexWanted].quantity + quantity;
+        localStorage.setItem('productsInCart', JSON.stringify(oldItems));
       }
     }
   }
-  else if (quantity == 0 && lastSelected !== '') {
-    alert('Merci de préciser une quantité');
-  }
-  else if (quantity !== 0 && lastSelected == '') {
-    alert('Merci de sélectionner une couleur');
-  }
-  else if (quantity == 0 && lastSelected == '') {
-    alert('Merci de sélectionner une couleur et de préciser une quantité');
-  }
+
+    else if (quantity == 0 && lastSelected !== '') {
+      alert('Merci de préciser une quantité');
+    }
+    else if (quantity !== 0 && lastSelected == '') {
+      alert('Merci de sélectionner une couleur');
+    }
+    else if (quantity == 0 && lastSelected == '') {
+      alert('Merci de sélectionner une couleur et de préciser une quantité');
+    }
+
+  
 }
-);
+)
+;
+
