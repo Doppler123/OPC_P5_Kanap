@@ -14,7 +14,7 @@ one_product_from_API();
 
 function one_product_from_API() {
 
-  fetch("http://localhost:3000/api/products/" + id_collected_wo_space + "")
+  fetch("http://localhost:3000/api/products/" + id_collected_wo_space)
 
     // On vérifie que la requête s'est bien déroulée :
     .then(function (res) {
