@@ -43,7 +43,7 @@ function getProductsData() {
       // On récupère la quantité totale de products dans le panier :  
       var total_quantity = 0;
       for (let i = 0; i < parsedLocalStorage.length; i++) {
-        total_quantity += parsedLocalStorage[i].quantity;
+        total_quantity += parseInt(parsedLocalStorage[i].quantity);
       }
 
       // On affiche la quantité totale de products dans le panier au bon endroit :
@@ -76,5 +76,29 @@ function getProductsData() {
       let totalPriceId = document.querySelector('#totalPrice');
       totalPriceId.innerHTML = numStr(total_price);
 
-    })
+
+      // On intervient à la modification du sélecteur de quantités :
+      let allItemQuantity = document.querySelectorAll(".itemQuantity");
+
+      allItemQuantity.forEach(element =>
+        element.addEventListener('change', function () {
+          // On met à jour le DOM instantanément à chaque modification sur le sélecteur de quantité :
+          element.setAttribute('value', this.value);
+          // On met à jour le localStorage avec la même valeur :
+          let elementId = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id');
+          let elementColor = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-color');
+          var oldItems = JSON.parse(localStorage.getItem('productsInCart'));
+          const afterIdFilter = oldItems.filter(item => item.id === elementId);
+          const afterColorFilter = afterIdFilter.filter(items => items.color === elementColor);
+          var indexWanted = oldItems.indexOf(afterColorFilter[0]);
+          oldItems[indexWanted].quantity = element.getAttribute('value');
+          localStorage.setItem('productsInCart', JSON.stringify(oldItems));
+        }
+        )
+      );
+
+    }
+    )
 }
+
+
