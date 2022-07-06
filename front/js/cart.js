@@ -27,17 +27,19 @@ function getProductsData() {
       let cart__items = document.querySelector('#cart__items');
       let parsedLocalStorage = (JSON.parse(localStorage.productsInCart));
       for (let i = 0; i < parsedLocalStorage.length; i++) {
-        cart__items.innerHTML += '<article class="cart__item" data-id="'
-          + parsedLocalStorage[i].id + '" data-color="'
-          + parsedLocalStorage[i].color
-          + '"><div class="cart__item__img"><img src="'
-          + getDatasFromId(parsedLocalStorage[i].id)[0] + '" alt="'
-          + getDatasFromId(parsedLocalStorage[i].id)[1] + '"></div><div class="cart__item__content"><div class="cart__item__content__description"><h2>'
-          + getDatasFromId(parsedLocalStorage[i].id)[2] + '</h2><p>'
-          + parsedLocalStorage[i].color
-          + '</p><p>'
-          + getDatasFromId(parsedLocalStorage[i].id)[3] + ' €</p></div><div class="cart__item__content__settings"><div class="cart__item__content__settings__quantity"><p>Qté : </p><input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="'
-          + parsedLocalStorage[i].quantity + '"></div><div class="cart__item__content__settings__delete"><p class="deleteItem">Supprimer</p></div></div></div></article>';
+        if (parsedLocalStorage[i].quantity != 0) {
+          cart__items.innerHTML += '<article class="cart__item" data-id="'
+            + parsedLocalStorage[i].id + '" data-color="'
+            + parsedLocalStorage[i].color
+            + '"><div class="cart__item__img"><img src="'
+            + getDatasFromId(parsedLocalStorage[i].id)[0] + '" alt="'
+            + getDatasFromId(parsedLocalStorage[i].id)[1] + '"></div><div class="cart__item__content"><div class="cart__item__content__description"><h2>'
+            + getDatasFromId(parsedLocalStorage[i].id)[2] + '</h2><p>'
+            + parsedLocalStorage[i].color
+            + '</p><p>'
+            + getDatasFromId(parsedLocalStorage[i].id)[3] + ' €</p></div><div class="cart__item__content__settings"><div class="cart__item__content__settings__quantity"><p>Qté : </p><input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="'
+            + parsedLocalStorage[i].quantity + '"></div><div class="cart__item__content__settings__delete"><p class="deleteItem">Supprimer</p></div></div></div></article>';
+        }
       }
 
       // On récupère la quantité totale de products dans le panier :  
@@ -79,7 +81,6 @@ function getProductsData() {
 
       // On intervient à la modification du sélecteur de quantités :
       let allItemQuantity = document.querySelectorAll(".itemQuantity");
-
       allItemQuantity.forEach(element =>
         element.addEventListener('change', function () {
           // On met à jour le DOM instantanément à chaque modification sur le sélecteur de quantité :
@@ -97,6 +98,25 @@ function getProductsData() {
         )
       );
 
+      // On intervient au clic du bouton "Supprimer"
+      let deleteItem = document.querySelectorAll(".deleteItem");
+      deleteItem.forEach(element =>
+        element.addEventListener('click', () => {
+          // On met à jour le DOM instantanément à chaque clic du bouton "Supprimer":
+          let cartItem = element.parentElement.parentElement.parentElement.parentElement;
+          cartItem.remove();
+          // On met à jour le localStorage pour chaque suppression :
+          let elementId = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id');
+          let elementColor = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-color');
+          var oldItems = JSON.parse(localStorage.getItem('productsInCart'));
+          const afterIdFilter = oldItems.filter(item => item.id === elementId);
+          const afterColorFilter = afterIdFilter.filter(items => items.color === elementColor);
+          var indexWanted = oldItems.indexOf(afterColorFilter[0]);
+          oldItems[indexWanted].quantity = 0;
+          localStorage.setItem('productsInCart', JSON.stringify(oldItems));
+        }
+        )
+      )
     }
     )
 }
