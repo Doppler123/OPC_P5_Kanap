@@ -76,10 +76,9 @@ button.addEventListener('click', () => {
         var oldItems = [];
       }
 
-      const afterIdFilter = oldItems.filter(item => item.id === id_collected_wo_space);
-      const afterColorFilter = afterIdFilter.filter(items => items.color === lastSelected);
+      const afterFilter = oldItems.filter(item => item.id === id_collected_wo_space && item.color === lastSelected);
 
-      if (afterColorFilter.length == 0) {
+      if (afterFilter.length == 0) {
         var newItem = {
           id: id_collected_wo_space,
           color: lastSelected,
@@ -89,7 +88,7 @@ button.addEventListener('click', () => {
         localStorage.setItem('productsInCart', JSON.stringify(oldItems));
       }
       else {
-        var indexWanted = oldItems.indexOf(afterColorFilter[0]);
+        var indexWanted = oldItems.indexOf(afterFilter[0]);
         oldItems[indexWanted].quantity = oldItems[indexWanted].quantity + quantity;
         localStorage.setItem('productsInCart', JSON.stringify(oldItems));
       }

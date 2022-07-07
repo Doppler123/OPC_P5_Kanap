@@ -4,7 +4,11 @@ function getProductsData() {
 
   let myApi = "http://localhost:3000/api/products";
   fetch(myApi)
-    .then((response) => response.json())
+    .then(function (res) {
+      if (res.ok) {
+        return res.json();
+      }
+    })
     .then(async function (requestResults) {
 
       const products = await requestResults;
@@ -13,11 +17,11 @@ function getProductsData() {
       function getDatasFromId(id) {
         for (let i = 0; i <= products.length; i++) {
           if (id == products[i]._id) {
-            let imageUrlFromSofaNumber = products[i].imageUrl;
-            let altTxtFromSofaNumber = products[i].altTxt;
-            let nameFromSofaNumber = products[i].name;
-            let priceFromSofaNumber = products[i].price;
-            return [imageUrlFromSofaNumber, altTxtFromSofaNumber, nameFromSofaNumber, priceFromSofaNumber];
+            let productObject = {imageUrlFromSofaNumber : products[i].imageUrl, 
+              altTxtFromSofaNumber : products[i].altTxt, 
+              nameFromSofaNumber : products[i].name, 
+              priceFromSofaNumber : products[i].price};
+            return productObject;
           }
         }
       }
@@ -32,33 +36,31 @@ function getProductsData() {
             + parsedLocalStorage[i].id + '" data-color="'
             + parsedLocalStorage[i].color
             + '"><div class="cart__item__img"><img src="'
-            + getDatasFromId(parsedLocalStorage[i].id)[0] + '" alt="'
-            + getDatasFromId(parsedLocalStorage[i].id)[1] + '"></div><div class="cart__item__content"><div class="cart__item__content__description"><h2>'
-            + getDatasFromId(parsedLocalStorage[i].id)[2] + '</h2><p>'
+            + getDatasFromId(parsedLocalStorage[i].id).imageUrlFromSofaNumber + '" alt="'    
+            + getDatasFromId(parsedLocalStorage[i].id).altTxtFromSofaNumber + '"></div><div class="cart__item__content"><div class="cart__item__content__description"><h2>'
+            + getDatasFromId(parsedLocalStorage[i].id).nameFromSofaNumber + '</h2><p>'
             + parsedLocalStorage[i].color
             + '</p><p>'
-            + getDatasFromId(parsedLocalStorage[i].id)[3] + ' €</p></div><div class="cart__item__content__settings"><div class="cart__item__content__settings__quantity"><p>Qté : </p><input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="'
+            + getDatasFromId(parsedLocalStorage[i].id).priceFromSofaNumber + ' €</p></div><div class="cart__item__content__settings"><div class="cart__item__content__settings__quantity"><p>Qté : </p><input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="'
             + parsedLocalStorage[i].quantity + '"></div><div class="cart__item__content__settings__delete"><p class="deleteItem">Supprimer</p></div></div></div></article>';
         }
       }
 
-      // On récupère la quantité totale de products dans le panier :  
-      var total_quantity = 0;
-      for (let i = 0; i < parsedLocalStorage.length; i++) {
-        total_quantity += parseInt(parsedLocalStorage[i].quantity);
+      // On créé une fonction permettant d'afficher la quantité totale de products dans le panier :
+      function displayTotalQuantity() {
+        // On récupère la quantité totale de products dans le panier :  
+        var total_quantity = 0;
+        for (let i = 0; i < parsedLocalStorage.length; i++) {
+          total_quantity += parseInt(parsedLocalStorage[i].quantity);
+        }
+        // On affiche la quantité totale de products dans le panier au bon endroit : // mettre l'ensemble dans une fonction et appeler à la fin des addEvent listener
+        let totalQuantityId = document.querySelector('#totalQuantity');
+        totalQuantityId.innerHTML = total_quantity;
       }
 
-      // On affiche la quantité totale de products dans le panier au bon endroit :
-      let totalQuantityId = document.querySelector('#totalQuantity');
-      totalQuantityId.innerHTML = total_quantity;
+      displayTotalQuantity();
 
-      // On récupère le montant total du panier :  
-      var total_price = 0;
-      for (let i = 0; i < parsedLocalStorage.length; i++) {
-        total_price += ((parsedLocalStorage[i].quantity * getDatasFromId(parsedLocalStorage[i].id)[3]));
-      }
-
-      // On ajoute une fonction permettant de séparer les milliers pour plus de lisibilité :
+      // On créé une fonction permettant de séparer les milliers pour plus de lisibilité :
       function numStr(a, b) {
         a = '' + a;
         b = b || ' ';
@@ -74,10 +76,19 @@ function getProductsData() {
         return c;
       }
 
-      // On affiche le montant total du panier au bon endroit :
-      let totalPriceId = document.querySelector('#totalPrice');
-      totalPriceId.innerHTML = numStr(total_price);
+      // On créé une fonction permettant d'afficher le montant total du panier :
+      function displayTotalCartPrice() {
+        // On récupère le montant total du panier :  
+        var total_price = 0;
+        for (let i = 0; i < parsedLocalStorage.length; i++) {
+          total_price += ((parsedLocalStorage[i].quantity * getDatasFromId(parsedLocalStorage[i].id)[3]));
+        }
+        // On affiche le montant total du panier au bon endroit :   // mettre l'ensemble dans une fonction et appeler à la fin des addEvent listener
+        let totalPriceId = document.querySelector('#totalPrice');
+        totalPriceId.innerHTML = numStr(total_price);
+      }
 
+      displayTotalCartPrice();
 
       // On intervient à la modification du sélecteur de quantités :
       let allItemQuantity = document.querySelectorAll(".itemQuantity");
@@ -103,22 +114,26 @@ function getProductsData() {
       deleteItem.forEach(element =>
         element.addEventListener('click', () => {
           // On met à jour le DOM instantanément à chaque clic du bouton "Supprimer":
-          let cartItem = element.parentElement.parentElement.parentElement.parentElement;
+          var cartItem = element.parentElement.parentElement.parentElement.parentElement;
           cartItem.remove();
-          // On met à jour le localStorage pour chaque suppression :
-          let elementId = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id');
-          let elementColor = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-color');
+          // On met à jour le localStorage pour chaque suppression :   
+          var elementId = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id');
+          var elementColor = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-color');
           var oldItems = JSON.parse(localStorage.getItem('productsInCart'));
           const afterIdFilter = oldItems.filter(item => item.id === elementId);
           const afterColorFilter = afterIdFilter.filter(items => items.color === elementColor);
           var indexWanted = oldItems.indexOf(afterColorFilter[0]);
-          oldItems[indexWanted].quantity = 0;
+          oldItems.splice(indexWanted, 1);
           localStorage.setItem('productsInCart', JSON.stringify(oldItems));
         }
         )
       )
     }
     )
+    .catch(function (err) {
+      // Une erreur est survenue
+    })
+    ;
 }
 
 
