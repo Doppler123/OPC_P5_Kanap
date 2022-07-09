@@ -28,6 +28,22 @@ function one_product_from_API() {
       const product = requestResults;
       console.log(product);
 
+      // On créé une fonction permettant de séparer les milliers pour plus de lisibilité :
+      function numStr(a, b) {
+        a = '' + a;
+        b = b || ' ';
+        var c = '',
+          d = 0;
+        while (a.match(/^0[0-9]/)) {
+          a = a.substr(1);
+        }
+        for (var i = a.length - 1; i >= 0; i--) {
+          c = (d != 0 && d % 3 == 0) ? a[i] + b + c : a[i] + c;
+          d++;
+        }
+        return c;
+      }
+
       // On insère les données selon ce qui est commenté dans le fichier HTML :
       var product_image = document.querySelector('.item__img');
       product_image.innerHTML = '<img src="' + product.imageUrl + '">';
@@ -36,7 +52,7 @@ function one_product_from_API() {
       product_name.textContent = '' + product.name + '';
 
       var product_price = document.querySelector('#price');
-      product_price.textContent = '' + product.price + '';
+      product_price.textContent = '' + numStr(parseInt(product.price)) + '';
 
       var product_description = document.querySelector('#description');
       product_description.textContent = '' + product.description + '';
@@ -89,7 +105,7 @@ button.addEventListener('click', () => {
       }
       else {
         var indexWanted = oldItems.indexOf(afterFilter[0]);
-        oldItems[indexWanted].quantity = oldItems[indexWanted].quantity + quantity;
+        oldItems[indexWanted].quantity = parseInt(oldItems[indexWanted].quantity) + parseInt(quantity);
         localStorage.setItem('productsInCart', JSON.stringify(oldItems));
       }
     }

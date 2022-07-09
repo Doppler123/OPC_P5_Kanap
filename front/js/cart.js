@@ -17,10 +17,12 @@ function getProductsData() {
       function getDatasFromId(id) {
         for (let i = 0; i <= products.length; i++) {
           if (id == products[i]._id) {
-            let productObject = {imageUrlFromSofaNumber : products[i].imageUrl, 
-              altTxtFromSofaNumber : products[i].altTxt, 
-              nameFromSofaNumber : products[i].name, 
-              priceFromSofaNumber : products[i].price};
+            let productObject = {
+              imageUrlFromSofaNumber: products[i].imageUrl,
+              altTxtFromSofaNumber: products[i].altTxt,
+              nameFromSofaNumber: products[i].name,
+              priceFromSofaNumber: products[i].price
+            };
             return productObject;
           }
         }
@@ -36,75 +38,105 @@ function getProductsData() {
             + parsedLocalStorage[i].id + '" data-color="'
             + parsedLocalStorage[i].color
             + '"><div class="cart__item__img"><img src="'
-            + getDatasFromId(parsedLocalStorage[i].id).imageUrlFromSofaNumber + '" alt="'    
+            + getDatasFromId(parsedLocalStorage[i].id).imageUrlFromSofaNumber + '" alt="'
             + getDatasFromId(parsedLocalStorage[i].id).altTxtFromSofaNumber + '"></div><div class="cart__item__content"><div class="cart__item__content__description"><h2>'
             + getDatasFromId(parsedLocalStorage[i].id).nameFromSofaNumber + '</h2><p>'
             + parsedLocalStorage[i].color
             + '</p><p>'
-            + getDatasFromId(parsedLocalStorage[i].id).priceFromSofaNumber + ' €</p></div><div class="cart__item__content__settings"><div class="cart__item__content__settings__quantity"><p>Qté : </p><input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="'
+            + numStr(parseInt(getDatasFromId(parsedLocalStorage[i].id).priceFromSofaNumber)) + ' €</p></div><div class="cart__item__content__settings"><div class="cart__item__content__settings__quantity"><p>Qté : </p><input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="'
             + parsedLocalStorage[i].quantity + '"></div><div class="cart__item__content__settings__delete"><p class="deleteItem">Supprimer</p></div></div></div></article>';
         }
       }
 
       // On créé une fonction permettant d'afficher la quantité totale de products dans le panier :
-      function displayTotalQuantity() {
+      function getTotalQuantity() {
         // On récupère la quantité totale de products dans le panier :  
         var total_quantity = 0;
         for (let i = 0; i < parsedLocalStorage.length; i++) {
           total_quantity += parseInt(parsedLocalStorage[i].quantity);
         }
-        // On affiche la quantité totale de products dans le panier au bon endroit : // mettre l'ensemble dans une fonction et appeler à la fin des addEvent listener
-        let totalQuantityId = document.querySelector('#totalQuantity');
-        totalQuantityId.innerHTML = total_quantity;
+        return total_quantity;
       }
 
-      displayTotalQuantity();
+      // On affiche la quantité totale de products dans le panier au bon endroit : // mettre l'ensemble dans une fonction et appeler à la fin des addEvent listener
+      let totalQuantityId = document.querySelector('#totalQuantity');
+      totalQuantityId.innerHTML = getTotalQuantity();
 
       // On créé une fonction permettant de séparer les milliers pour plus de lisibilité :
-      function numStr(a, b) {
-        a = '' + a;
-        b = b || ' ';
-        var c = '',
-          d = 0;
-        while (a.match(/^0[0-9]/)) {
-          a = a.substr(1);
-        }
-        for (var i = a.length - 1; i >= 0; i--) {
-          c = (d != 0 && d % 3 == 0) ? a[i] + b + c : a[i] + c;
-          d++;
-        }
-        return c;
-      }
+            function numStr(a, b) {
+              a = '' + a;
+              b = b || ' ';
+              var c = '',
+                d = 0;
+              while (a.match(/^0[0-9]/)) {
+                a = a.substr(1);
+              }
+              for (var i = a.length - 1; i >= 0; i--) {
+                c = (d != 0 && d % 3 == 0) ? a[i] + b + c : a[i] + c;
+                d++;
+              }
+              return c;
+            } 
 
       // On créé une fonction permettant d'afficher le montant total du panier :
-      function displayTotalCartPrice() {
+      function getTotalCartPrice() {
         // On récupère le montant total du panier :  
         var total_price = 0;
         for (let i = 0; i < parsedLocalStorage.length; i++) {
-          total_price += ((parsedLocalStorage[i].quantity * getDatasFromId(parsedLocalStorage[i].id)[3]));
+          total_price += ((parsedLocalStorage[i].quantity * getDatasFromId(parsedLocalStorage[i].id).priceFromSofaNumber));
         }
-        // On affiche le montant total du panier au bon endroit :   // mettre l'ensemble dans une fonction et appeler à la fin des addEvent listener
-        let totalPriceId = document.querySelector('#totalPrice');
-        totalPriceId.innerHTML = numStr(total_price);
+        return total_price;
       }
 
-      displayTotalCartPrice();
+      getTotalCartPrice();
+
+      // On affiche le montant total du panier au bon endroit :   
+      let totalPriceId = document.querySelector('#totalPrice');
+      totalPriceId.innerHTML = numStr(parseInt(getTotalCartPrice()));
 
       // On intervient à la modification du sélecteur de quantités :
       let allItemQuantity = document.querySelectorAll(".itemQuantity");
       allItemQuantity.forEach(element =>
         element.addEventListener('change', function () {
+          let quantityBeforeChange = parseInt(element.getAttribute('value'));
           // On met à jour le DOM instantanément à chaque modification sur le sélecteur de quantité :
           element.setAttribute('value', this.value);
+          // On vérifie si l'utilisateur a ajouté ou retiré un produit et combien de fois :
+          let quantityAfterChange = parseInt(element.getAttribute('value'));
+          let oldItems = JSON.parse(localStorage.getItem('productsInCart'));
+          let oldTotalQuantity = 0;
+          for (var z in oldItems) {
+            oldTotalQuantity += parseInt(oldItems[z].quantity);
+          }
+          let oldTotalPrice = 0;
+          for (let r = 0; r < oldItems.length; r++) {
+            oldTotalPrice += ((oldItems[r].quantity * getDatasFromId(oldItems[r].id).priceFromSofaNumber));
+          }
           // On met à jour le localStorage avec la même valeur :
           let elementId = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id');
           let elementColor = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-color');
-          var oldItems = JSON.parse(localStorage.getItem('productsInCart'));
-          const afterIdFilter = oldItems.filter(item => item.id === elementId);
-          const afterColorFilter = afterIdFilter.filter(items => items.color === elementColor);
-          var indexWanted = oldItems.indexOf(afterColorFilter[0]);
+          const afterFilter = oldItems.filter(item => item.id === elementId && item.color === elementColor);
+          let indexWanted = oldItems.indexOf(afterFilter[0]);
           oldItems[indexWanted].quantity = element.getAttribute('value');
           localStorage.setItem('productsInCart', JSON.stringify(oldItems));
+          // On met à jour la quantité d'article du panier :
+          let totalQuantityId = document.querySelector('#totalQuantity');
+          if (quantityAfterChange > quantityBeforeChange) {
+          totalQuantityId.innerHTML = parseInt(oldTotalQuantity) +1;
+          }
+          else {
+          totalQuantityId.innerHTML = parseInt(oldTotalQuantity) -1;
+          }
+          // On met à jour le prix total du panier :
+          let newItems = JSON.parse(localStorage.getItem('productsInCart'));
+          if (quantityAfterChange > quantityBeforeChange) {
+          new_total_price = oldTotalPrice + parseInt(getDatasFromId(newItems[indexWanted].id).priceFromSofaNumber);
+          }
+          else {
+            new_total_price = oldTotalPrice - parseInt(getDatasFromId(newItems[indexWanted].id).priceFromSofaNumber); 
+          }
+          let totalPriceId = document.querySelector('#totalPrice');
+          totalPriceId.innerHTML = numStr(parseInt(new_total_price));
         }
         )
       );
@@ -113,18 +145,34 @@ function getProductsData() {
       let deleteItem = document.querySelectorAll(".deleteItem");
       deleteItem.forEach(element =>
         element.addEventListener('click', () => {
+          // let thisQuantity = element.parentElement.parentElement.children[0].children[1].getAttribute('value');
           // On met à jour le DOM instantanément à chaque clic du bouton "Supprimer":
-          var cartItem = element.parentElement.parentElement.parentElement.parentElement;
+          let cartItem = element.parentElement.parentElement.parentElement.parentElement;
           cartItem.remove();
-          // On met à jour le localStorage pour chaque suppression :   
-          var elementId = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id');
-          var elementColor = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-color');
-          var oldItems = JSON.parse(localStorage.getItem('productsInCart'));
-          const afterIdFilter = oldItems.filter(item => item.id === elementId);
-          const afterColorFilter = afterIdFilter.filter(items => items.color === elementColor);
-          var indexWanted = oldItems.indexOf(afterColorFilter[0]);
+          // On met à jour le localStorage pour chaque suppression : 
+          let oldItems = JSON.parse(localStorage.getItem('productsInCart'));
+          let elementId = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-id');
+          let elementColor = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-color');
+          const afterFilter = oldItems.filter(item => item.id === elementId && item.color === elementColor);
+          let indexWanted = oldItems.indexOf(afterFilter[0]);
+          // let totalPriceDeleted = parseInt((thisQuantity * getDatasFromId(oldItems[indexWanted].id).priceFromSofaNumber));
+          // console.log(totalPriceDeleted);
           oldItems.splice(indexWanted, 1);
           localStorage.setItem('productsInCart', JSON.stringify(oldItems));
+          // On met à jour la quantité d'article du panier :
+          let totalQuantityAfterDelete = 0;
+          for (var y in oldItems) {
+            totalQuantityAfterDelete += parseInt(oldItems[y].quantity);
+          }
+          let totalQuantityId = document.querySelector('#totalQuantity');
+          totalQuantityId.innerHTML = totalQuantityAfterDelete;
+          // On met à jour le prix total du panier :
+          let newTotalPrice = 0;
+          for (let x = 0; x < oldItems.length; x++) {
+            newTotalPrice += ((oldItems[x].quantity * getDatasFromId(oldItems[x].id).priceFromSofaNumber));
+          }
+          let totalPriceId = document.querySelector('#totalPrice');
+          totalPriceId.innerHTML = numStr(parseInt(newTotalPrice));
         }
         )
       )
