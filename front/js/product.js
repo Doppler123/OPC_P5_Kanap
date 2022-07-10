@@ -64,8 +64,8 @@ function one_product_from_API() {
       });
     }
     )
-    .catch(function (err) {
-      // Une erreur est survenue
+    .catch((err) => {
+      alert("Il y a eu une erreur : " + err);
     })
     ;
 }
@@ -123,5 +123,5 @@ button.addEventListener('click', () => {
 
 }
 )
-  ;
+;
 
