@@ -1,11 +1,9 @@
-let parsedLocalStorage = (JSON.parse(localStorage.productsInCart));
-console.log(parsedLocalStorage);
-if (parsedLocalStorage.length != 0) {
-getProductsData();
-checkFormAndPostRequest();
-} 
-else if (parsedLocalStorage = []){
+if (localStorage.getItem('productsInCart') === null) {
   alert('Votre panier est vide pour le moment!');
+}
+else {
+  getProductsData();
+  checkFormAndPostRequest();
 }
 
 function getProductsData() {
@@ -41,17 +39,17 @@ function getProductsData() {
       let cart__items = document.querySelector('#cart__items');
       let parsedLocalStorage = (JSON.parse(localStorage.productsInCart));
       for (let i = 0; i < parsedLocalStorage.length; i++) {
-          cart__items.innerHTML += '<article class="cart__item" data-id="'
-            + parsedLocalStorage[i].id + '" data-color="'
-            + parsedLocalStorage[i].color
-            + '"><div class="cart__item__img"><img src="'
-            + getDatasFromId(parsedLocalStorage[i].id).imageUrlFromSofaNumber + '" alt="'
-            + getDatasFromId(parsedLocalStorage[i].id).altTxtFromSofaNumber + '"></div><div class="cart__item__content"><div class="cart__item__content__description"><h2>'
-            + getDatasFromId(parsedLocalStorage[i].id).nameFromSofaNumber + '</h2><p>'
-            + parsedLocalStorage[i].color
-            + '</p><p>'
-            + numStr(parseInt(getDatasFromId(parsedLocalStorage[i].id).priceFromSofaNumber)) + ' €</p></div><div class="cart__item__content__settings"><div class="cart__item__content__settings__quantity"><p>Qté : </p><input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="'
-            + parsedLocalStorage[i].quantity + '"></div><div class="cart__item__content__settings__delete"><p class="deleteItem">Supprimer</p></div></div></div></article>';
+        cart__items.innerHTML += '<article class="cart__item" data-id="'
+          + parsedLocalStorage[i].id + '" data-color="'
+          + parsedLocalStorage[i].color
+          + '"><div class="cart__item__img"><img src="'
+          + getDatasFromId(parsedLocalStorage[i].id).imageUrlFromSofaNumber + '" alt="'
+          + getDatasFromId(parsedLocalStorage[i].id).altTxtFromSofaNumber + '"></div><div class="cart__item__content"><div class="cart__item__content__description"><h2>'
+          + getDatasFromId(parsedLocalStorage[i].id).nameFromSofaNumber + '</h2><p>'
+          + parsedLocalStorage[i].color
+          + '</p><p>'
+          + numStr(parseInt(getDatasFromId(parsedLocalStorage[i].id).priceFromSofaNumber)) + ' €</p></div><div class="cart__item__content__settings"><div class="cart__item__content__settings__quantity"><p>Qté : </p><input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="'
+          + parsedLocalStorage[i].quantity + '"></div><div class="cart__item__content__settings__delete"><p class="deleteItem">Supprimer</p></div></div></div></article>';
       }
 
       // On créé une fonction permettant d'afficher la quantité totale de products dans le panier :
@@ -256,34 +254,30 @@ async function checkFormAndPostRequest() {
         products: arrayWithOnlyIds,
       };
       console.log(orderDatas);
+
+      // -------  Envoi de la requête POST au back-end --------
+      fetch("http://localhost:3000/api/products/order", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderDatas),
+      })
+        .then((response) => response.json())
+        .then(function (orderInfos) {
+          console.log(orderInfos);
+          console.log(orderInfos.orderId);
+          localStorage.clear();
+          document.location.href = 'confirmation.html?orderId=' + orderInfos.orderId + '';
+        })
+        .catch((err) => {
+          alert("Il y a eu une erreur : " + err);
+        });
     }
 
-    // -------  Envoi de la requête POST au back-end --------
-    fetch("http://localhost:3000/api/products/order", {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(orderDatas),
-    })
-      .then((response) => response.json())
-      .then(function (orderInfos) {
-        console.log(orderInfos);
-        console.log(orderInfos.orderId);
-        localStorage.clear();
-        document.location.href = 'confirmation.html?orderId='+orderInfos.orderId+'';
-      })
-      .catch((err) => {
-        alert("Il y a eu une erreur : " + err);
-      });
   }
   )
     ;
 
-
-
-
-
 }
-
 

@@ -1,20 +1,20 @@
 // On récupère l'id du produit dans l'url de la page courrante :
 
-let current_url = document.location.href;
-let url = new URL(current_url);
-let search_params = new URLSearchParams(url.search);
-if (search_params.has('id')) {
-  let id_collected = search_params.get('id');
-  var id_collected_wo_space = id_collected.replace(/ /g, '');
+let currentUrl = document.location.href;
+let url = new URL(currentUrl);
+let searchParams = new URLSearchParams(url.search);
+if (searchParams.has('id')) {
+  let idCollected = searchParams.get('id');
+  var idCollectedWoSpace = idCollected.replace(/ /g, '');
 }
 
 // On requête l'API pour récupérer uniquement le produit dont l'id est dans l'url de la page :
 
-one_product_from_API();
+oneProductFromAPI();
 
-function one_product_from_API() {
+function oneProductFromAPI() {
 
-  fetch("http://localhost:3000/api/products/" + id_collected_wo_space)
+  fetch("http://localhost:3000/api/products/" + idCollectedWoSpace)
 
     // On vérifie que la requête s'est bien déroulée :
     .then(function (res) {
@@ -45,22 +45,22 @@ function one_product_from_API() {
       }
 
       // On insère les données selon ce qui est commenté dans le fichier HTML :
-      var product_image = document.querySelector('.item__img');
-      product_image.innerHTML = '<img src="' + product.imageUrl + '">';
+      var productImage = document.querySelector('.item__img');
+      productImage.innerHTML = '<img src="' + product.imageUrl + '">';
 
-      var product_name = document.querySelector('#title');
-      product_name.textContent = '' + product.name + '';
+      var productName = document.querySelector('#title');
+      productName.textContent = '' + product.name + '';
 
-      var product_price = document.querySelector('#price');
-      product_price.textContent = '' + numStr(parseInt(product.price)) + '';
+      var productPrice = document.querySelector('#price');
+      productPrice.textContent = '' + numStr(parseInt(product.price)) + '';
 
-      var product_description = document.querySelector('#description');
-      product_description.textContent = '' + product.description + '';
+      var productDescription = document.querySelector('#description');
+      productDescription.textContent = '' + product.description + '';
 
-      var product_options = document.querySelector('#colors');
+      var productOptions = document.querySelector('#colors');
 
       product.colors.forEach(i => {
-        product_options.innerHTML += '<option value="' + i + '">' + i + '</option>';
+        productOptions.innerHTML += '<option value="' + i + '">' + i + '</option>';
       });
     }
     )
@@ -92,11 +92,11 @@ button.addEventListener('click', () => {
         var oldItems = [];
       }
 
-      const afterFilter = oldItems.filter(item => item.id === id_collected_wo_space && item.color === lastSelected);
+      const afterFilter = oldItems.filter(item => item.id === idCollectedWoSpace && item.color === lastSelected);
 
       if (afterFilter.length == 0) {
         var newItem = {
-          id: id_collected_wo_space,
+          id: idCollectedWoSpace,
           color: lastSelected,
           quantity: quantity,
         }
