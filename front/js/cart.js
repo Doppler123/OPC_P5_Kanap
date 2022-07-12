@@ -1,6 +1,12 @@
+let parsedLocalStorage = (JSON.parse(localStorage.productsInCart));
+console.log(parsedLocalStorage);
+if (parsedLocalStorage.length != 0) {
 getProductsData();
 checkFormAndPostRequest();
-
+} 
+else if (parsedLocalStorage = []){
+  alert('Votre panier est vide pour le moment!');
+}
 
 function getProductsData() {
 
@@ -35,7 +41,6 @@ function getProductsData() {
       let cart__items = document.querySelector('#cart__items');
       let parsedLocalStorage = (JSON.parse(localStorage.productsInCart));
       for (let i = 0; i < parsedLocalStorage.length; i++) {
-        if (parsedLocalStorage.length != 0) {
           cart__items.innerHTML += '<article class="cart__item" data-id="'
             + parsedLocalStorage[i].id + '" data-color="'
             + parsedLocalStorage[i].color
@@ -47,7 +52,6 @@ function getProductsData() {
             + '</p><p>'
             + numStr(parseInt(getDatasFromId(parsedLocalStorage[i].id).priceFromSofaNumber)) + ' €</p></div><div class="cart__item__content__settings"><div class="cart__item__content__settings__quantity"><p>Qté : </p><input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="'
             + parsedLocalStorage[i].quantity + '"></div><div class="cart__item__content__settings__delete"><p class="deleteItem">Supprimer</p></div></div></div></article>';
-        }
       }
 
       // On créé une fonction permettant d'afficher la quantité totale de products dans le panier :
@@ -178,7 +182,6 @@ function getProductsData() {
         }
         )
       )
-
     }
     )
 
@@ -186,20 +189,6 @@ function getProductsData() {
       alert("Il y a eu une erreur : " + err);
     });
   ;
-}
-
-let localStorageConfirmed = JSON.parse(localStorage.getItem('productsInCart'));
-
-for (let i = 0; i < localStorageConfirmed.length; i++) {
-  delete localStorageConfirmed[i].color;
-  delete localStorageConfirmed[i].quantity;
-}
-
-let arrayWithOnlyIds = [];
-for (let i = 0; i < localStorageConfirmed.length; i++) {
-  let allIds = '';
-  allIds += localStorageConfirmed[i].id;
-  arrayWithOnlyIds.push(allIds);
 }
 
 async function checkFormAndPostRequest() {
@@ -222,6 +211,21 @@ async function checkFormAndPostRequest() {
 
   submit.addEventListener("click", (e) => {
     e.preventDefault();
+
+    let localStorageConfirmed = JSON.parse(localStorage.getItem('productsInCart'));
+
+    for (let i = 0; i < localStorageConfirmed.length; i++) {
+      delete localStorageConfirmed[i].color;
+      delete localStorageConfirmed[i].quantity;
+    }
+
+    let arrayWithOnlyIds = [];
+    for (let i = 0; i < localStorageConfirmed.length; i++) {
+      let allIds = '';
+      allIds += localStorageConfirmed[i].id;
+      arrayWithOnlyIds.push(allIds);
+    }
+
     // Si le formulaire est valide, on créé un objet qui contiendra :
     // 1. 1 tableau qui contiendra les produits confirmés 
     // 2. 1 objet avec les données client du formulaire
@@ -241,7 +245,7 @@ async function checkFormAndPostRequest() {
       e.preventDefault();
     }
     else {
-      const order = {
+      var orderDatas = {
         contact: {
           firstName: inputFirstName.value.toString(),
           lastName: inputLastName.value.toString(),
@@ -251,28 +255,35 @@ async function checkFormAndPostRequest() {
         },
         products: arrayWithOnlyIds,
       };
-      console.log(order);
+      console.log(orderDatas);
     }
+
+    // -------  Envoi de la requête POST au back-end --------
+    fetch("http://localhost:3000/api/products/order", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderDatas),
+    })
+      .then((response) => response.json())
+      .then(function (orderInfos) {
+        console.log(orderInfos);
+        console.log(orderInfos.orderId);
+        localStorage.clear();
+        document.location.href = 'confirmation.html?orderId='+orderInfos.orderId+'';
+      })
+      .catch((err) => {
+        alert("Il y a eu une erreur : " + err);
+      });
   }
   )
     ;
 
-  // -------  Envoi de la requête POST au back-end --------
 
-/*   const options = {
-    method: "POST",
-    body: JSON.stringify(order),
-    headers: { "Content-Type": "application/json" },
-  };
 
-  fetch('http://localhost:3000/api/products/order', options)
-    .then((response) => response.json())
-    .then((orderId) => {
-      console.log(orderId);
-    })
-    .catch((err) => {
-      alert("Il y a eu une erreur : " + err);
-    }); */
+
+
 }
 
 
