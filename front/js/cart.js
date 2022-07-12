@@ -36,10 +36,10 @@ function getProductsData() {
 
       // On met en place une boucle qui itère et récupère une partie des données dans le localStorage et l'autre partie grâce à la fonction getDatasFromId.
       // On place les données aux bons endroits
-      let cart__items = document.querySelector('#cart__items');
+      let cartItems = document.querySelector('#cart__items');
       let parsedLocalStorage = (JSON.parse(localStorage.productsInCart));
       for (let i = 0; i < parsedLocalStorage.length; i++) {
-        cart__items.innerHTML += '<article class="cart__item" data-id="'
+        cartItems.innerHTML += '<article class="cart__item" data-id="'
           + parsedLocalStorage[i].id + '" data-color="'
           + parsedLocalStorage[i].color
           + '"><div class="cart__item__img"><img src="'
@@ -55,11 +55,11 @@ function getProductsData() {
       // On créé une fonction permettant d'afficher la quantité totale de products dans le panier :
       function getTotalQuantity() {
         // On récupère la quantité totale de products dans le panier :  
-        var total_quantity = 0;
+        let totalQuantity = 0;
         for (let i = 0; i < parsedLocalStorage.length; i++) {
-          total_quantity += parseInt(parsedLocalStorage[i].quantity);
+          totalQuantity += parseInt(parsedLocalStorage[i].quantity);
         }
-        return total_quantity;
+        return totalQuantity;
       }
 
       // On affiche la quantité totale de products dans le panier au bon endroit : // mettre l'ensemble dans une fonction et appeler à la fin des addEvent listener
@@ -70,12 +70,12 @@ function getProductsData() {
       function numStr(a, b) {
         a = '' + a;
         b = b || ' ';
-        var c = '',
+        let c = '',
           d = 0;
         while (a.match(/^0[0-9]/)) {
           a = a.substr(1);
         }
-        for (var i = a.length - 1; i >= 0; i--) {
+        for (let i = a.length - 1; i >= 0; i--) {
           c = (d != 0 && d % 3 == 0) ? a[i] + b + c : a[i] + c;
           d++;
         }
@@ -85,11 +85,11 @@ function getProductsData() {
       // On créé une fonction permettant d'afficher le montant total du panier :
       function getTotalCartPrice() {
         // On récupère le montant total du panier :  
-        var total_price = 0;
+        let totalPrice = 0;
         for (let i = 0; i < parsedLocalStorage.length; i++) {
-          total_price += ((parsedLocalStorage[i].quantity * getDatasFromId(parsedLocalStorage[i].id).priceFromSofaNumber));
+          totalPrice += ((parsedLocalStorage[i].quantity * getDatasFromId(parsedLocalStorage[i].id).priceFromSofaNumber));
         }
-        return total_price;
+        return totalPrice;
       }
 
       getTotalCartPrice();
@@ -109,7 +109,7 @@ function getProductsData() {
           let quantityAfterChange = parseInt(element.getAttribute('value'));
           let oldItems = JSON.parse(localStorage.getItem('productsInCart'));
           let oldTotalQuantity = 0;
-          for (var z in oldItems) {
+          for (let z in oldItems) {
             oldTotalQuantity += parseInt(oldItems[z].quantity);
           }
           let oldTotalPrice = 0;
@@ -134,13 +134,13 @@ function getProductsData() {
           // On met à jour le prix total du panier :
           let newItems = JSON.parse(localStorage.getItem('productsInCart'));
           if (quantityAfterChange > quantityBeforeChange) {
-            new_total_price = oldTotalPrice + parseInt(getDatasFromId(newItems[indexWanted].id).priceFromSofaNumber);
+            priceAfterUpdate = oldTotalPrice + parseInt(getDatasFromId(newItems[indexWanted].id).priceFromSofaNumber);
           }
           else {
-            new_total_price = oldTotalPrice - parseInt(getDatasFromId(newItems[indexWanted].id).priceFromSofaNumber);
+            priceAfterUpdate = oldTotalPrice - parseInt(getDatasFromId(newItems[indexWanted].id).priceFromSofaNumber);
           }
           let totalPriceId = document.querySelector('#totalPrice');
-          totalPriceId.innerHTML = numStr(parseInt(new_total_price));
+          totalPriceId.innerHTML = numStr(parseInt(priceAfterUpdate));
         }
         )
       );
@@ -165,7 +165,7 @@ function getProductsData() {
           localStorage.setItem('productsInCart', JSON.stringify(oldItems));
           // On met à jour la quantité d'article du panier :
           let totalQuantityAfterDelete = 0;
-          for (var y in oldItems) {
+          for (let y in oldItems) {
             totalQuantityAfterDelete += parseInt(oldItems[y].quantity);
           }
           let totalQuantityId = document.querySelector('#totalQuantity');
@@ -243,7 +243,7 @@ async function checkFormAndPostRequest() {
       e.preventDefault();
     }
     else {
-      var orderDatas = {
+      const orderDatas = {
         contact: {
           firstName: inputFirstName.value.toString(),
           lastName: inputLastName.value.toString(),

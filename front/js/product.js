@@ -32,12 +32,12 @@ function oneProductFromAPI() {
       function numStr(a, b) {
         a = '' + a;
         b = b || ' ';
-        var c = '',
+        let c = '',
           d = 0;
         while (a.match(/^0[0-9]/)) {
           a = a.substr(1);
         }
-        for (var i = a.length - 1; i >= 0; i--) {
+        for (let i = a.length - 1; i >= 0; i--) {
           c = (d != 0 && d % 3 == 0) ? a[i] + b + c : a[i] + c;
           d++;
         }
@@ -45,19 +45,19 @@ function oneProductFromAPI() {
       }
 
       // On insère les données selon ce qui est commenté dans le fichier HTML :
-      var productImage = document.querySelector('.item__img');
+      let productImage = document.querySelector('.item__img');
       productImage.innerHTML = '<img src="' + product.imageUrl + '">';
 
-      var productName = document.querySelector('#title');
+      let productName = document.querySelector('#title');
       productName.textContent = '' + product.name + '';
 
-      var productPrice = document.querySelector('#price');
+      let productPrice = document.querySelector('#price');
       productPrice.textContent = '' + numStr(parseInt(product.price)) + '';
 
-      var productDescription = document.querySelector('#description');
+      let productDescription = document.querySelector('#description');
       productDescription.textContent = '' + product.description + '';
 
-      var productOptions = document.querySelector('#colors');
+      let productOptions = document.querySelector('#colors');
 
       product.colors.forEach(i => {
         productOptions.innerHTML += '<option value="' + i + '">' + i + '</option>';
@@ -78,8 +78,8 @@ let select = document.querySelector("#colors");
 
 button.addEventListener('click', () => {
 
-  var lastSelected = select.options[select.selectedIndex].value;
-  var quantity = parseInt(document.querySelector("#quantity").value);
+  let lastSelected = select.options[select.selectedIndex].value;
+  let quantity = parseInt(document.querySelector("#quantity").value);
 
   if (quantity !== 0 && lastSelected !== '') {
 
@@ -95,7 +95,7 @@ button.addEventListener('click', () => {
       const afterFilter = oldItems.filter(item => item.id === idCollectedWoSpace && item.color === lastSelected);
 
       if (afterFilter.length == 0) {
-        var newItem = {
+        let newItem = {
           id: idCollectedWoSpace,
           color: lastSelected,
           quantity: quantity,
@@ -104,7 +104,7 @@ button.addEventListener('click', () => {
         localStorage.setItem('productsInCart', JSON.stringify(oldItems));
       }
       else {
-        var indexWanted = oldItems.indexOf(afterFilter[0]);
+        let indexWanted = oldItems.indexOf(afterFilter[0]);
         oldItems[indexWanted].quantity = parseInt(oldItems[indexWanted].quantity) + parseInt(quantity);
         localStorage.setItem('productsInCart', JSON.stringify(oldItems));
       }
