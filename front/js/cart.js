@@ -1,4 +1,4 @@
-if (localStorage.getItem('productsInCart') === null) {
+if (localStorage.getItem('productsInCart') === null || localStorage.getItem('productsInCart') == '[]') {
   let totalQuantityPosition = document.querySelector('#totalQuantity');
   let totalPricePosition = document.querySelector('#totalPrice');
   totalQuantityPosition.textContent= '0';
@@ -208,8 +208,8 @@ async function checkFormAndPostRequest() {
   let cityErrorMsg = document.querySelector("#cityErrorMsg");
   let emailErrorMsg = document.querySelector("#emailErrorMsg");
 
-
   submit.addEventListener("click", (e) => {
+    
     e.preventDefault();
 
     let localStorageConfirmed = JSON.parse(localStorage.getItem('productsInCart'));
@@ -241,25 +241,25 @@ async function checkFormAndPostRequest() {
       !inputEmail.value
     ) {
       if (!inputFirstName.value) {
-        firstNameErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
+        firstNameErrorMsg.innerHTML = "Vous devez renseigner tous les champs!";
       }
-      else if (!inputLastName.value) {
-        lastNameErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
+      if (!inputLastName.value) {
+        lastNameErrorMsg.innerHTML = "Vous devez renseigner tous les champs!";
       }
-      else if (!inputAddress.value) {
-        addressErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
+      if (!inputAddress.value) {
+        addressErrorMsg.innerHTML = "Vous devez renseigner tous les champs!";
       }
-      else if (!inputCity.value) {
-        cityErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
+      if (!inputCity.value) {
+        cityErrorMsg.innerHTML = "Vous devez renseigner tous les champs!";
       }
-      else if (!inputEmail.value) {
-        emailErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
+      if (!inputEmail.value) {
+        emailErrorMsg.innerHTML = "Vous devez renseigner tous les champs!";
       }
       e.preventDefault();
     }
 
     else if (regexEmailTested === false) {
-      emailErrorMsg.innerHTML = "Adresse email invalide!";
+      emailErrorMsg.innerHTML = "Adresse email invalide...";
     }
 
     else {
@@ -274,6 +274,8 @@ async function checkFormAndPostRequest() {
         products: arrayWithOnlyIds,
       };
 
+  if (localStorageConfirmed !== 'undefined' && (localStorageConfirmed.length) > 0) {    
+     
       // -------  Envoi de la requête POST au back-end --------
       fetch("http://localhost:3000/api/products/order", {
         method: "POST",
@@ -295,10 +297,16 @@ async function checkFormAndPostRequest() {
           alert("Il y a eu une erreur : " + err);
         });
     }
-
+    else{
+      alert('Votre panier est vide pour le moment!');
+    }
+  }
   }
   )
     ;
 
 }
+
+
+
 
