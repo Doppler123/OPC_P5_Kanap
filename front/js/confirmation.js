@@ -11,6 +11,5 @@ orderIdcollected = searchParams.get('orderId');
 
 // On se place au bon endroit de la page et on y affiche l'orderId :
 let orderIdSpan = document.querySelector('#orderId');
-console.log(orderIdcollected);
 orderIdSpan.textContent = orderIdcollected;
 }

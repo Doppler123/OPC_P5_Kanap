@@ -15,7 +15,6 @@ function allProductsFromAPI() {
     // On récupère les résultats de la requête à l'API :
     .then(function (requestResults) {
       const sofas = requestResults;
-      console.log(sofas);
 
       // On se place au niveau de la section "#items" du HTML :
       let items = document.querySelector('#items');

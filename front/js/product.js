@@ -26,7 +26,6 @@ function oneProductFromAPI() {
     // On récupère les résultats de la requête à l'API :
     .then(function (requestResults) {
       const product = requestResults;
-      console.log(product);
 
       // On créé une fonction permettant de séparer les milliers pour plus de lisibilité :
       function numStr(a, b) {

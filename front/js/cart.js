@@ -1,4 +1,8 @@
 if (localStorage.getItem('productsInCart') === null) {
+  let totalQuantityPosition = document.querySelector('#totalQuantity');
+  let totalPricePosition = document.querySelector('#totalPrice');
+  totalQuantityPosition.textContent= '0';
+  totalPricePosition.textContent= '0';
   alert('Votre panier est vide pour le moment!');
 }
 else {
@@ -15,6 +19,7 @@ function getProductsData() {
         return res.json();
       }
     })
+
     .then(async function (requestResults) {
 
       const products = await requestResults;
@@ -149,7 +154,6 @@ function getProductsData() {
       let deleteItem = document.querySelectorAll(".deleteItem");
       deleteItem.forEach(element =>
         element.addEventListener('click', () => {
-          // let thisQuantity = element.parentElement.parentElement.children[0].children[1].getAttribute('value');
           // On met à jour le DOM instantanément à chaque clic du bouton "Supprimer":
           let cartItem = element.parentElement.parentElement.parentElement.parentElement;
           cartItem.remove();
@@ -159,8 +163,6 @@ function getProductsData() {
           let elementColor = element.parentElement.parentElement.parentElement.parentElement.getAttribute('data-color');
           const afterFilter = oldItems.filter(item => item.id === elementId && item.color === elementColor);
           let indexWanted = oldItems.indexOf(afterFilter[0]);
-          // let totalPriceDeleted = parseInt((thisQuantity * getDatasFromId(oldItems[indexWanted].id).priceFromSofaNumber));
-          // console.log(totalPriceDeleted);
           oldItems.splice(indexWanted, 1);
           localStorage.setItem('productsInCart', JSON.stringify(oldItems));
           // On met à jour la quantité d'article du panier :
@@ -224,9 +226,12 @@ async function checkFormAndPostRequest() {
       arrayWithOnlyIds.push(allIds);
     }
 
-    // Si le formulaire est valide, on créé un objet qui contiendra :
+    // Si le formulaire est valide, on créé un objet qui contiendra (conformément à la doc de l'API):
     // 1. 1 tableau qui contiendra les produits confirmés 
     // 2. 1 objet avec les données client du formulaire
+
+    let regexEmail = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+    let regexEmailTested = regexEmail.test(inputEmail.value);
 
     if (
       !inputFirstName.value ||
@@ -235,13 +240,28 @@ async function checkFormAndPostRequest() {
       !inputCity.value ||
       !inputEmail.value
     ) {
-      firstNameErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
-      lastNameErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
-      addressErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
-      cityErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
-      emailErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
+      if (!inputFirstName.value) {
+        firstNameErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
+      }
+      else if (!inputLastName.value) {
+        lastNameErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
+      }
+      else if (!inputAddress.value) {
+        addressErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
+      }
+      else if (!inputCity.value) {
+        cityErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
+      }
+      else if (!inputEmail.value) {
+        emailErrorMsg.innerHTML = "Vous devez renseigner tous les champs !";
+      }
       e.preventDefault();
     }
+
+    else if (regexEmailTested === false) {
+      emailErrorMsg.innerHTML = "Adresse email invalide!";
+    }
+
     else {
       const orderDatas = {
         contact: {
@@ -253,7 +273,6 @@ async function checkFormAndPostRequest() {
         },
         products: arrayWithOnlyIds,
       };
-      console.log(orderDatas);
 
       // -------  Envoi de la requête POST au back-end --------
       fetch("http://localhost:3000/api/products/order", {
@@ -263,10 +282,12 @@ async function checkFormAndPostRequest() {
         },
         body: JSON.stringify(orderDatas),
       })
-        .then((response) => response.json())
+        .then(function (res) {
+          if (res.ok) {
+            return res.json();
+          }
+        })
         .then(function (orderInfos) {
-          console.log(orderInfos);
-          console.log(orderInfos.orderId);
           localStorage.clear();
           document.location.href = 'confirmation.html?orderId=' + orderInfos.orderId + '';
         })
