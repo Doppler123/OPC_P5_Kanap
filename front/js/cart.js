@@ -1,8 +1,8 @@
 if (localStorage.getItem('productsInCart') === null || localStorage.getItem('productsInCart') == '[]') {
   let totalQuantityPosition = document.querySelector('#totalQuantity');
   let totalPricePosition = document.querySelector('#totalPrice');
-  totalQuantityPosition.textContent= '0';
-  totalPricePosition.textContent= '0';
+  totalQuantityPosition.textContent = '0';
+  totalPricePosition.textContent = '0';
   alert('Votre panier est vide pour le moment!');
 }
 else {
@@ -67,7 +67,7 @@ function getProductsData() {
         return totalQuantity;
       }
 
-      // On affiche la quantité totale de products dans le panier au bon endroit : // mettre l'ensemble dans une fonction et appeler à la fin des addEvent listener
+      // On affiche la quantité totale de products dans le panier au bon endroit : 
       let totalQuantityId = document.querySelector('#totalQuantity');
       totalQuantityId.innerHTML = getTotalQuantity();
 
@@ -87,9 +87,8 @@ function getProductsData() {
         return c;
       }
 
-      // On créé une fonction permettant d'afficher le montant total du panier :
+      // On créé une fonction permettant de récupèrer le montant total du panier : 
       function getTotalCartPrice() {
-        // On récupère le montant total du panier :  
         let totalPrice = 0;
         for (let i = 0; i < parsedLocalStorage.length; i++) {
           totalPrice += ((parsedLocalStorage[i].quantity * getDatasFromId(parsedLocalStorage[i].id).priceFromSofaNumber));
@@ -191,6 +190,7 @@ function getProductsData() {
   ;
 }
 
+// On créé la fonction qui va vérifier la validité du formulaire et envoyer la requête POST à l'API si valide (au clic du bouton "Commander !")
 async function checkFormAndPostRequest() {
 
   // On récupère les emplacements des champs d'inputs depuis le DOM :
@@ -209,7 +209,7 @@ async function checkFormAndPostRequest() {
   let emailErrorMsg = document.querySelector("#emailErrorMsg");
 
   submit.addEventListener("click", (e) => {
-    
+
     e.preventDefault();
 
     let localStorageConfirmed = JSON.parse(localStorage.getItem('productsInCart'));
@@ -227,8 +227,8 @@ async function checkFormAndPostRequest() {
     }
 
     // Si le formulaire est valide, on créé un objet qui contiendra (conformément à la doc de l'API):
-    // 1. 1 tableau qui contiendra les produits confirmés 
-    // 2. 1 objet avec les données client du formulaire
+    // 1. 1 objet qui contiendra les données client du formulaire (sous forme de strings)
+    // 2. 1 tableau qui contiendra uniquement les Ids des produits confirmés (sous forme de strings)
 
     let regexEmail = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
     let regexEmailTested = regexEmail.test(inputEmail.value);
@@ -274,33 +274,33 @@ async function checkFormAndPostRequest() {
         products: arrayWithOnlyIds,
       };
 
-  if (localStorageConfirmed !== 'undefined' && (localStorageConfirmed.length) > 0) {    
-     
-      // -------  Envoi de la requête POST au back-end --------
-      fetch("http://localhost:3000/api/products/order", {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderDatas),
-      })
-        .then(function (res) {
-          if (res.ok) {
-            return res.json();
-          }
+      if (localStorageConfirmed !== 'undefined' && (localStorageConfirmed.length) > 0) {
+
+        // -------  Envoi de la requête POST au back-end --------
+        fetch("http://localhost:3000/api/products/order", {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(orderDatas),
         })
-        .then(function (orderInfos) {
-          localStorage.clear();
-          document.location.href = 'confirmation.html?orderId=' + orderInfos.orderId + '';
-        })
-        .catch((err) => {
-          alert("Il y a eu une erreur : " + err);
-        });
+          .then(function (res) {
+            if (res.ok) {
+              return res.json();
+            }
+          })
+          .then(function (orderInfos) {
+            localStorage.clear();
+            document.location.href = 'confirmation.html?orderId=' + orderInfos.orderId + '';
+          })
+          .catch((err) => {
+            alert("Il y a eu une erreur : " + err);
+          });
+      }
+      else {
+        alert('Votre panier est vide pour le moment!');
+      }
     }
-    else{
-      alert('Votre panier est vide pour le moment!');
-    }
-  }
   }
   )
     ;
