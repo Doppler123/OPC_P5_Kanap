@@ -58,6 +58,7 @@ function getProductsData() {
       }
 
       // On créé une fonction permettant d'afficher la quantité totale de products dans le panier :
+      // voir si je peux mettre ça en tête de page?
       function getTotalQuantity() {
         // On récupère la quantité totale de products dans le panier :  
         let totalQuantity = 0;
@@ -71,7 +72,8 @@ function getProductsData() {
       let totalQuantityId = document.querySelector('#totalQuantity');
       totalQuantityId.innerHTML = getTotalQuantity();
 
-      // On créé une fonction permettant de séparer les milliers pour plus de lisibilité :
+      // On créé une fonction permettant de séparer les milliers pour plus de lisibilité (prend en paramètre le nombre "a" et le séparateur souhaité "b"):
+       // à mettre dans le fichier utils.js
       function numStr(a, b) {
         a = '' + a;
         b = b || ' ';
@@ -88,6 +90,7 @@ function getProductsData() {
       }
 
       // On créé une fonction permettant de récupèrer le montant total du panier : 
+      // voir si je peux mettre ça en tête de page?
       function getTotalCartPrice() {
         let totalPrice = 0;
         for (let i = 0; i < parsedLocalStorage.length; i++) {
@@ -214,6 +217,7 @@ async function checkFormAndPostRequest() {
 
     let localStorageConfirmed = JSON.parse(localStorage.getItem('productsInCart'));
 
+    // faire un map sur localStorageCOnfirmed pour récupérer que les Ids
     for (let i = 0; i < localStorageConfirmed.length; i++) {
       delete localStorageConfirmed[i].color;
       delete localStorageConfirmed[i].quantity;

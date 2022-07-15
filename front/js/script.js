@@ -1,4 +1,4 @@
-// On requête l'API pour récupérer tous les produits :
+// On requête l'API pour récupérer tous les produits et les afficher correctement dans la page d'index:
 allProductsFromAPI();
 
 function allProductsFromAPI() {

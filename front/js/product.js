@@ -28,6 +28,7 @@ function oneProductFromAPI() {
       const product = requestResults;
 
       // On créé une fonction permettant de séparer les milliers pour plus de lisibilité :
+             // à mettre dans le fichier utils.js
       function numStr(a, b) {
         a = '' + a;
         b = b || ' ';
