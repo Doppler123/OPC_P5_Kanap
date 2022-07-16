@@ -1,3 +1,19 @@
+// On créé une fonction permettant de séparer les milliers pour plus de lisibilité (prend en paramètre le nombre "a" et le séparateur souhaité "b"):
+function numStr(a, b) {
+  a = '' + a;
+  b = b || ' ';
+  let c = '',
+    d = 0;
+  while (a.match(/^0[0-9]/)) {
+    a = a.substr(1);
+  }
+  for (let i = a.length - 1; i >= 0; i--) {
+    c = (d != 0 && d % 3 == 0) ? a[i] + b + c : a[i] + c;
+    d++;
+  }
+  return c;
+}
+
 if (localStorage.getItem('productsInCart') === null || localStorage.getItem('productsInCart') == '[]') {
   let totalQuantityPosition = document.querySelector('#totalQuantity');
   let totalPricePosition = document.querySelector('#totalPrice');
@@ -71,23 +87,6 @@ function getProductsData() {
       // On affiche la quantité totale de products dans le panier au bon endroit : 
       let totalQuantityId = document.querySelector('#totalQuantity');
       totalQuantityId.innerHTML = getTotalQuantity();
-
-      // On créé une fonction permettant de séparer les milliers pour plus de lisibilité (prend en paramètre le nombre "a" et le séparateur souhaité "b"):
-       // à mettre dans le fichier utils.js
-      function numStr(a, b) {
-        a = '' + a;
-        b = b || ' ';
-        let c = '',
-          d = 0;
-        while (a.match(/^0[0-9]/)) {
-          a = a.substr(1);
-        }
-        for (let i = a.length - 1; i >= 0; i--) {
-          c = (d != 0 && d % 3 == 0) ? a[i] + b + c : a[i] + c;
-          d++;
-        }
-        return c;
-      }
 
       // On créé une fonction permettant de récupèrer le montant total du panier : 
       // voir si je peux mettre ça en tête de page?
