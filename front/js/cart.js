@@ -1,19 +1,10 @@
-// On créé une fonction permettant de séparer les milliers pour plus de lisibilité (prend en paramètre le nombre "a" et le séparateur souhaité "b"):
-function numStr(a, b) {
-  a = '' + a;
-  b = b || ' ';
-  let c = '',
-    d = 0;
-  while (a.match(/^0[0-9]/)) {
-    a = a.substr(1);
-  }
-  for (let i = a.length - 1; i >= 0; i--) {
-    c = (d != 0 && d % 3 == 0) ? a[i] + b + c : a[i] + c;
-    d++;
-  }
-  return c;
-}
+// On ajoute à la page "cart" la prise en compte du fichier utils.js :
+let path = "../js/utils.js";
+let script = document.createElement("script");
+script.src = path;
+document.body.appendChild(script);
 
+// Si le panier est vide au chargement de la page, on affiche "0 article" et "0 €" et on envoie un message d'alerte à l'utilisateur, sinon, on appelle les fonctions gérant les requêtes :
 if (localStorage.getItem('productsInCart') === null || localStorage.getItem('productsInCart') == '[]') {
   let totalQuantityPosition = document.querySelector('#totalQuantity');
   let totalPricePosition = document.querySelector('#totalPrice');
@@ -22,11 +13,11 @@ if (localStorage.getItem('productsInCart') === null || localStorage.getItem('pro
   alert('Votre panier est vide pour le moment!');
 }
 else {
-  getProductsData();
-  checkFormAndPostRequest();
+  getRequestAndDisplayData();
+  postRequestIfFormOk();
 }
 
-function getProductsData() {
+function getRequestAndDisplayData() {
 
   let myApi = "http://localhost:3000/api/products";
   fetch(myApi)
@@ -40,7 +31,7 @@ function getProductsData() {
 
       const products = await requestResults;
 
-      // On créé une fonction qui prend en paramètre l'id du produit et qui renvoie les données correspondantes dont nous aurons besoin (hors ce qui est déja stocké dans le localStorage)
+      // On créé une fonction qui prend en paramètre l'id du produit et qui renvoie les données correspondantes dont nous aurons besoin (hors ce qui est déja stocké dans le localStorage) :
       function getDatasFromId(id) {
         for (let i = 0; i <= products.length; i++) {
           if (id == products[i]._id) {
@@ -56,7 +47,7 @@ function getProductsData() {
       }
 
       // On met en place une boucle qui itère et récupère une partie des données dans le localStorage et l'autre partie grâce à la fonction getDatasFromId.
-      // On place les données aux bons endroits
+      // On place les données aux bons endroits :
       let cartItems = document.querySelector('#cart__items');
       let parsedLocalStorage = (JSON.parse(localStorage.productsInCart));
       for (let i = 0; i < parsedLocalStorage.length; i++) {
@@ -73,36 +64,25 @@ function getProductsData() {
           + parsedLocalStorage[i].quantity + '"></div><div class="cart__item__content__settings__delete"><p class="deleteItem">Supprimer</p></div></div></div></article>';
       }
 
-      // On créé une fonction permettant d'afficher la quantité totale de products dans le panier :
-      // voir si je peux mettre ça en tête de page?
-      function getTotalQuantity() {
-        // On récupère la quantité totale de products dans le panier :  
-        let totalQuantity = 0;
-        for (let i = 0; i < parsedLocalStorage.length; i++) {
-          totalQuantity += parseInt(parsedLocalStorage[i].quantity);
-        }
-        return totalQuantity;
+      // On créé une variable qui contient le nombre total d'article :
+      let totalQuantity = 0;
+      for (let i = 0; i < parsedLocalStorage.length; i++) {
+        totalQuantity += parseInt(parsedLocalStorage[i].quantity);
       }
 
       // On affiche la quantité totale de products dans le panier au bon endroit : 
       let totalQuantityId = document.querySelector('#totalQuantity');
-      totalQuantityId.innerHTML = getTotalQuantity();
+      totalQuantityId.innerHTML = totalQuantity;
 
-      // On créé une fonction permettant de récupèrer le montant total du panier : 
-      // voir si je peux mettre ça en tête de page?
-      function getTotalCartPrice() {
-        let totalPrice = 0;
-        for (let i = 0; i < parsedLocalStorage.length; i++) {
-          totalPrice += ((parsedLocalStorage[i].quantity * getDatasFromId(parsedLocalStorage[i].id).priceFromSofaNumber));
-        }
-        return totalPrice;
+      // On créé une variable qui contiendra le résultat du calcul du montant total du panier : 
+      let totalPrice = 0;
+      for (let i = 0; i < parsedLocalStorage.length; i++) {
+        totalPrice += ((parsedLocalStorage[i].quantity * getDatasFromId(parsedLocalStorage[i].id).priceFromSofaNumber));
       }
-
-      getTotalCartPrice();
 
       // On affiche le montant total du panier au bon endroit :   
       let totalPriceId = document.querySelector('#totalPrice');
-      totalPriceId.innerHTML = numStr(parseInt(getTotalCartPrice()));
+      totalPriceId.innerHTML = numStr(parseInt(totalPrice));
 
       // On intervient à la modification du sélecteur de quantités :
       let allItemQuantity = document.querySelectorAll(".itemQuantity");
@@ -192,8 +172,8 @@ function getProductsData() {
   ;
 }
 
-// On créé la fonction qui va vérifier la validité du formulaire et envoyer la requête POST à l'API si valide (au clic du bouton "Commander !")
-async function checkFormAndPostRequest() {
+// On créé la fonction qui va vérifier la validité du formulaire et envoyer la requête POST à l'API si valide (au clic du bouton "Commander !") :
+async function postRequestIfFormOk() {
 
   // On récupère les emplacements des champs d'inputs depuis le DOM :
 
@@ -215,12 +195,6 @@ async function checkFormAndPostRequest() {
     e.preventDefault();
 
     let localStorageConfirmed = JSON.parse(localStorage.getItem('productsInCart'));
-
-    // faire un map sur localStorageCOnfirmed pour récupérer que les Ids
-    for (let i = 0; i < localStorageConfirmed.length; i++) {
-      delete localStorageConfirmed[i].color;
-      delete localStorageConfirmed[i].quantity;
-    }
 
     let arrayWithOnlyIds = [];
     for (let i = 0; i < localStorageConfirmed.length; i++) {
@@ -244,19 +218,19 @@ async function checkFormAndPostRequest() {
       !inputEmail.value
     ) {
       if (!inputFirstName.value) {
-        firstNameErrorMsg.innerHTML = "Vous devez renseigner tous les champs!";
+        firstNameErrorMsg.innerHTML = "Il faut compléter le formulaire en entier pour passer commande";
       }
       if (!inputLastName.value) {
-        lastNameErrorMsg.innerHTML = "Vous devez renseigner tous les champs!";
+        lastNameErrorMsg.innerHTML = "Il faut compléter le formulaire en entier pour passer commande";
       }
       if (!inputAddress.value) {
-        addressErrorMsg.innerHTML = "Vous devez renseigner tous les champs!";
+        addressErrorMsg.innerHTML = "Il faut compléter le formulaire en entier pour passer commande";
       }
       if (!inputCity.value) {
-        cityErrorMsg.innerHTML = "Vous devez renseigner tous les champs!";
+        cityErrorMsg.innerHTML = "Il faut compléter le formulaire en entier pour passer commande";
       }
       if (!inputEmail.value) {
-        emailErrorMsg.innerHTML = "Vous devez renseigner tous les champs!";
+        emailErrorMsg.innerHTML = "Il faut compléter le formulaire en entier pour passer commande";
       }
       e.preventDefault();
     }
@@ -277,9 +251,9 @@ async function checkFormAndPostRequest() {
         products: arrayWithOnlyIds,
       };
 
+      // Si le panier n'est pas vide, on envoie l'objet "orderDatas" via une reqûete POST pour récupérer l'orderId de l'API puis rediriger l'utilisateur vers la page de confirmation :
       if (localStorageConfirmed !== 'undefined' && (localStorageConfirmed.length) > 0) {
 
-        // -------  Envoi de la requête POST au back-end --------
         fetch("http://localhost:3000/api/products/order", {
           method: "POST",
           headers: {
