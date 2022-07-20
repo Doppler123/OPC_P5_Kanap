@@ -91,7 +91,7 @@ function getRequestAndDisplayData() {
           let quantityBeforeChange = parseInt(element.getAttribute('value'));
           // On met à jour le DOM instantanément à chaque modification sur le sélecteur de quantité :
           element.setAttribute('value', this.value);
-          // On vérifie si l'utilisateur a ajouté ou retiré un produit et combien de fois :
+          // On vérifie si l'utilisateur a ajouté ou retiré un produit et combien :
           let quantityAfterChange = parseInt(element.getAttribute('value'));
           let oldItems = JSON.parse(localStorage.getItem('productsInCart'));
           let oldTotalQuantity = 0;

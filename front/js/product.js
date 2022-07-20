@@ -38,7 +38,6 @@ function oneProductFromAPI() {
       let productName = document.querySelector('#title');
       productName.textContent = '' + product.name + '';
 
-      
       let productPrice = document.querySelector('#price');
       productPrice.textContent = '' + numStr(parseInt(product.price)) + '';
 
@@ -46,7 +45,6 @@ function oneProductFromAPI() {
       productDescription.textContent = '' + product.description + '';
 
       let productOptions = document.querySelector('#colors');
-
       product.colors.forEach(i => {
         productOptions.innerHTML += '<option value="' + i + '">' + i + '</option>';
       });
